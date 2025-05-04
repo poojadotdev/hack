@@ -2,92 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tell Your Story</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Content Generator</title>
     <style>
-        * {
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
             margin: 0;
-            font-family: 'Times New Roman', Times, serif; font-size: 1.1rem;
-            background-image: linear-gradient(to bottom right, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
+            padding: 0;
         }
-
-        .form-container {
-            background: #fffbe7;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        
+        .container {
             max-width: 800px;
-            width: 100%;
+            margin: 30px auto;
+            padding: 20px;
         }
-
-        h1 {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 2.3rem;
+        
+        .header {
             text-align: center;
-            color: #222;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
         }
-
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
         label {
             display: block;
-            margin-top: 1.5rem;
-            font-weight: bold;
-            font-size: 1rem;
-            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
-
-        textarea, input[type="file"] {
+        
+        textarea {
             width: 100%;
-            padding: 1rem;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 12px;
-            font-family: 'Times New Roman', Times, serif; font-size: 1.1rem;
-            margin-top: 0.5rem;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            min-height: 200px;
+            font-family: inherit;
         }
-
-        button {
-            display: block;
-            margin: 2rem auto 0;
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            background: linear-gradient(135deg, #8e44ad, #3498db);
+        
+        .file-input {
+            margin-top: 10px;
+        }
+        
+        .submit-btn {
+            background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            font-weight: 500;
+            display: block;
+            width: 100%;
+            transition: background-color 0.3s;
         }
-
-        button:hover {
-            background: linear-gradient(135deg, #6c3483, #2471a3);
-            transform: translateY(-2px);
+        
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .examples {
+            margin-top: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        .examples h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .example-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .example-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .form-container, .examples {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>📖 Tell Your Story</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <label for="life_events">Your Story, Thoughts or Uploads</label>
-            <textarea name="life_events" placeholder="Describe your journey here..." required></textarea>
-
-            <label for="file">Upload Supporting Files (optional)</label>
-            <input type="file" name="file" multiple>
-
-            <button type="submit">✨ Generate Autobiography</button>
-        </form>
+    <div class="container">
+        <div class="header">
+            <h1>Social Media Content Generator</h1>
+            <p>Share your story, and we'll create engaging posts for LinkedIn, Instagram, and Twitter</p>
+        </div>
+        
+        <div class="form-container">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="user_input">Tell us about yourself or the situation you want to share:</label>
+                    <textarea id="user_input" name="user_input" placeholder="Describe your professional experience, a recent achievement, a challenge you've overcome, or any situation you'd like to share on social media. The more details you provide, the better content we can generate."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload additional files (optional):</label>
+                    <input type="file" name="file" multiple class="file-input">
+                    <small>Supported formats: .txt, .docx, images</small>
+                </div>
+                
+                <button type="submit" class="submit-btn">Generate Social Media Content</button>
+            </form>
+        </div>
+        
+        <div class="examples">
+            <h3>What You'll Get:</h3>
+            
+            <div class="example-item">
+                <strong>LinkedIn Post:</strong> A complete, ready-to-share professional post for your LinkedIn network
+            </div>
+            
+            <div class="example-item">
+                <strong>Instagram Content Ideas:</strong> 5 post ideas with visual suggestions, captions, and hashtags
+            </div>
+            
+            <div class="example-item">
+                <strong>Twitter Post Ideas:</strong> 5 tweet ideas optimized for engagement and visibility
+            </div>
+        </div>
     </div>
 </body>
 </html>

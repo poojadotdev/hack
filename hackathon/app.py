@@ -49,19 +49,9 @@ def extract_text(file_path):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        reflections = {
-            "early_memory": request.form.get("early_memory", ""),
-            "turning_point": request.form.get("turning_point", ""),
-            "regret": request.form.get("regret", ""),
-            "fear": request.form.get("fear", ""),
-            "purpose": request.form.get("purpose", ""),
-            "legacy": request.form.get("legacy", ""),
-            "life_lesson": request.form.get("life_lesson", ""),
-            "mentor_impact": request.form.get("mentor_impact", ""),
-            "breakthrough_moment": request.form.get("breakthrough_moment", ""),
-            "message_to_young_self": request.form.get("message_to_young_self", "")
-        }
-
+        # Collect all form inputs into a single text
+        user_input = request.form.get("user_input", "")
+        
         uploaded_files = request.files.getlist("file")
         extra_text = ""
 
@@ -72,32 +62,52 @@ def index():
                 file.save(path)
                 extra_text += "\n\n" + extract_text(path)
 
-        combined_text = "\n\n".join([f"{k.replace('_', ' ').capitalize()}: {v}" for k, v in reflections.items()]) + extra_text
+        combined_text = user_input + extra_text
 
+        # Create more effective prompts for social media content
         prompts = {
-            "cover": "You are a professional autobiographer. Create a compelling title and short intro paragraph.\nFormat:\nTitle: <Autobiography Title>\n\nIntroduction: <1 paragraph>",
-            "index": "Generate a 5-7 chapter index with titles and 1-line descriptions.\nFormat:\nChapter 1: <Title> - <Summary>",
-            "chapter": "Write Chapter 1 of the autobiography in 1st person.\nMake it vivid, emotional, and narrative style. Length: 500–800 words.",
             "linkedin": 
-                "You are a professional career storyteller. Based on the user's personal reflections, "
-                "generate a professional summary that could appear on their LinkedIn profile.\n\n"
-                "The tone should be confident, reflective, and authentic — balancing personal growth with professional value.\n"
-                "Write in the first person and keep it under 800 words.\n\n"
-                "Structure:\n"
-                "- A strong opening hook that captures curiosity\n"
-                "- 3–5 paragraphs highlighting their journey, pivotal skills, lessons learned, and values\n"
-                "- A closing statement that aligns purpose with professional mission\n\n"
-                "Use plain, engaging language that would connect well with recruiters, collaborators, and fellow professionals.\n\n"
-                "USER INPUT:\n{combined_text}",
-            "captions": "Generate 5 short Instagram/Twitter-style captions (<100 characters each)."
+                "You are a LinkedIn content creator specializing in professional storytelling. Based on the user's input, "
+                "create an engaging LinkedIn post that would resonate with their professional network.\n\n"
+                "Guidelines:\n"
+                "1. Write in first person with a professional yet authentic voice\n"
+                "2. Include a strong opening hook that captures attention\n"
+                "3. Share a meaningful insight, lesson, or story that demonstrates expertise or values\n"
+                "4. End with a thought-provoking question or call to action to encourage engagement\n"
+                "5. Keep the post between 1200-1500 characters (LinkedIn's sweet spot)\n"
+                "6. Format with clear paragraph breaks and use emojis sparingly if appropriate\n\n"
+                "The post should feel authentic, valuable, and encourage professional conversation.",
+                
+            "instagram": 
+                "You are an Instagram content strategist. Based on the user's input, "
+                "create 5 distinct Instagram post content ideas they could use.\n\n"
+                "For each idea, provide:\n"
+                "1. A brief description of the visual content (what the image/video should show)\n"
+                "2. A compelling caption (1-3 sentences)\n"
+                "3. 3-5 relevant hashtags\n"
+                "4. A suggestion for the type of post (carousel, single image, video, reel)\n\n"
+                "Make each idea different in tone and purpose (inspirational, educational, behind-the-scenes, etc.).\n"
+                "Format as a numbered list with clear sections for each post idea.",
+                
+            "twitter": 
+                "You are a Twitter/X content strategist. Based on the user's input, "
+                "create 5 diverse tweet ideas they could share.\n\n"
+                "For each tweet idea:\n"
+                "1. Write the actual tweet text (under 280 characters)\n"
+                "2. Suggest if it should include an image, poll, or link\n"
+                "3. Note what time of day might be best to post it\n"
+                "4. Include 1-2 relevant hashtags where appropriate\n\n"
+                "Create a mix of: thought leadership, questions, personal insights, and inspirational content.\n"
+                "Format as a numbered list with each tweet idea clearly separated."
         }
 
         limits = {
-            "cover": 400, "index": 500, "chapter": 900,
-            "linkedin": 700, "captions": 250
+            "linkedin": 700, 
+            "instagram": 500, 
+            "twitter": 500
         }
 
-        prompts = {k: v + f"\n\nLIFE EVENTS:\n{combined_text}" for k, v in prompts.items()}
+        prompts = {k: v + f"\n\nUSER INPUT:\n{combined_text}" for k, v in prompts.items()}
         token = str(uuid.uuid4())
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -124,7 +134,7 @@ def view_story(token):
         results = json.load(f)
 
     # Ordered display keys for structured rendering
-    ordered_keys = ["cover", "chapter", "index", "linkedin", "captions"]
+    ordered_keys = ["linkedin", "instagram", "twitter"]
     ordered_results = {key: results.get(key, "") for key in ordered_keys if key in results}
 
     return render_template("book.html", results=ordered_results, token=token, ordered_keys=ordered_keys, center_text=True)
@@ -153,4 +163,4 @@ def download_story(token):
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5012)
