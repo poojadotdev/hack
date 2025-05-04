@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your AI-Powered Life Story</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Times New Roman', Times, serif; font-size: 1.1rem;
+      background-image: linear-gradient(to bottom right, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-color: #f8f0e3;
+      color: #333;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+    
+      font-size: 2.5rem;
+      text-align: center;
+      font-family: 'Times New Roman', Times, serif; 
+      margin-bottom: 2rem;
+      color: #222;
+      text-align: center;
+    }
+
+    .book {
+      width: 100%;
+      max-width: 900px;
+      height: 480px;
+      position: relative;
+    }
+
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fffbe7;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+      padding: 2rem;
+      overflow-y: auto;
+      display: none;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .page h2 {
+      font-size: 1.5rem;
+      font-family: 'Times New Roman', Times, serif;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      align-items: center;
+      text-align: center;
+      
+    }
+
+    .page pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .controls {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .controls button {
+      padding: 0.6rem 1.4rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(to right, #8e44ad, #3498db);
+      color: white;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background: linear-gradient(to right, #6c3483, #2471a3);
+    }
+
+    .download-link {
+      margin-top: 1rem;
+      display: inline-block;
+      background: linear-gradient(to right, #28a745, #218838);
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Your AI-Powered Life Story</h1>
+
+<div class="book" id="book">
+  <!-- Cover Page -->
+  <div class="page active" id="page-0">
+    {% set cover = results.get("cover", "") %}
+    {% set title = cover.split("Introduction:")[0].replace("Title:", "").strip() %}
+    {% set intro = cover.split("Introduction:")[1].strip() if "Introduction:" in cover else "" %}
+    <h2>{{ title }}</h2>
+    <pre>{{ intro }}</pre>
+  </div>
+
+  {% set i = 1 %}
+  {% for section, content in results.items() %}
+    {% if section != 'index' and section != 'cover' %}
+      <div class="page" id="page-{{ i }}">
+        <h2>{% if section == 'chapter' %}This is a biography{% else %}{{ section|capitalize }}{% endif %}</h2>
+        <pre>{{ content }}</pre>
+        <button onclick="speakText(`{{ content | e }}`)">🔊 Listen</button>
+      </div>
+      {% set i = i + 1 %}
+    {% endif %}
+  {% endfor %}
+
+  <div class="page" id="page-{{ i }}">
+    <h2>Download Your Story</h2>
+    <a class="download-link" href="{{ url_for('download_story', token=token) }}">📥 Download Now</a>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="showPage(-1)">⬅ Prev</button>
+  <button onclick="showPage(1)">Next ➡</button>
+</div>
+
+<audio id="pageSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const pages = document.querySelectorAll('.page');
+    const pageSound = document.getElementById("pageSound");
+    let current = 0;
+
+    function updatePages() {
+      pages.forEach((page, i) => {
+        page.classList.toggle('active', i === current);
+      });
+    }
+
+    window.showPage = function (direction) {
+      const next = current + direction;
+      if (next >= 0 && next < pages.length) {
+        current = next;
+        pageSound.play();
+        updatePages();
+      } else if (next >= pages.length) {
+        alert("📚 You've reached the end of your story!");
+      }
+    };
+
+    window.speakText = function (text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(msg);
+    };
+  });
+</script>
+
+</body>
+</html>
