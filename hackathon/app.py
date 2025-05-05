@@ -11,7 +11,7 @@ from docx import Document
 
 # Load environment variables
 load_dotenv()
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = os.getenv("SECRET_KEY", "devkey")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 UPLOAD_FOLDER = "uploads"
@@ -163,4 +163,4 @@ def download_story(token):
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5012)
+    app.run(debug=True, port=5014)
